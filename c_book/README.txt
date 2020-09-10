@@ -1,0 +1,1 @@
+This file contains the exercises and notes from Richie and Kernigham
