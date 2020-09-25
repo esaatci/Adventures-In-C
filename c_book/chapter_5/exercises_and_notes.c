@@ -2,6 +2,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <string.h>
+#include <limits.h>
 
 /* Chapter 5.1 */
 /*
@@ -175,7 +176,6 @@ void exercise_five_one_tests(void)
     {
         printf("the number rxed is %d\n", x);
     }
-
 }
 
 void exercise_five_two_tests(void)
@@ -184,7 +184,6 @@ void exercise_five_two_tests(void)
     double k;
     exercise_five_two(&k);
     printf("the number is %f\n", k);
-
 }
 
 /* Chapter 5-4 */
@@ -202,8 +201,6 @@ void exercise_five_three(char *s, char *t)
 
     for(; *s != '\0'; s++);
     while((*s++ = *t++) != '\0');
-
-
 }
 
 void exercise_five_three_tests(void)
@@ -264,7 +261,6 @@ void exercise_five_four_tests(void)
     char *t4 = "world";
     result = exercise_five_four(s2, t2);
     printf("the second result is %d\n", result);
-
 }
 
 
@@ -279,7 +275,6 @@ void my_strncpy(char *s, const char *t, int n)
         *s++ = *t++;
     }
     *s = '\0';
-    
 }
 /*
 concatenate at most n characters of string ct to string s, terminate s with ’\0’; return s.
@@ -332,11 +327,233 @@ void exercise_five_five_tests(void)
     char ct[] = "Howdy";
     result = my_strncmp(cs, ct, 5);
     printf("the result is %d\n", result);
-
 }
 
 void exercise_five_six(void);
 /* Chapter 5.6 */
+/* look at pointer_arrays.c */
+
+/* Chapter 5.7 */ 
+/*
+More generally, only the first dimension (subscript) of an array is free; all the others have to be specified.
+*/
+static char daytab[2][13] = {
+    {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
+    {0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+};
+/* day_of_year:  set day of year from month & day */
+int day_of_year(int year, int month, int day)
+{
+    int i, leap;
+    /* check year */
+    if(year < 0)
+    {
+        printf("year cannot be negative\n");
+        return 0;
+    } 
+
+    /* !(month >= 1 && month <= 12) */
+    if(!(month >= 1 && month <= 12)) 
+    {
+        printf("month is invalid\n");
+        return 0;
+    }
+
+    /* (day >= 1 && day <= 31) */
+    if(!(day >= 1 && day <= 31)) 
+    {
+        printf("day is invalid\n");
+        return 0;
+    }
+
+    leap = ((year%4 == 0) && (year%100 != 0)) || (year%400 == 0);
+    /* check if day is greater than max month */
+    if(day > daytab[leap][month]) {
+        printf("day is greater than max month day\n");
+        return 0;
+    }
+
+    for (i = 1; i < month; i++)
+    {
+        day += daytab[leap][i];
+    }
+    return day;
+}
+/* month_day:  set month, day from day of year */
+void month_day(int year, int yearday, int *pmonth, int *pday)
+{
+    int i, leap;
+    if(!pmonth || !pday)
+    {
+        printf("the pointers are null\n");
+        return;
+    }
+
+    if(year < 0)
+    {
+        printf("year cannot be negative\n");
+        return; 
+    } 
+
+    if(yearday < 1 || yearday > 365)
+    {
+        printf("invalid yearday\n");
+        return;
+    }
+    leap = ((year%4 == 0) && (year%100 != 0)) || (year%400 == 0);
+    
+    for (i = 1; yearday > daytab[leap][i]; i++)
+    {
+        yearday -= daytab[leap][i];
+    }
+    
+    *pmonth = i;
+    *pday = yearday;
+}
+
+void exercise_five_eight_tests(void) 
+{
+    int year, month, day, yearday;
+    year = 2020;
+    month = 9;
+    day = 24;
+    yearday = day_of_year(year, month, day);
+    printf("the result of day_year is %d\n", yearday); 
+    
+    int pmonth, pday;
+    pmonth = pday = 0;
+    month_day(year, yearday, &pmonth, &pday);
+
+    printf("month is %d, day is %d\n", pmonth, pday);
+}
+
+/* Chapter 5.8 */
+
+/* month_name:  return name of n-th month */
+char *month_name(int n)
+{
+    static char *name[] = {
+        "Illegal month",
+        "January", "February", "March",
+        "April", "May", "June",
+        "July", "August", "September",
+        "October", "November", "December"
+    };
+    return (n < 1 || n > 12) ? name[0] : name[n];
+}
+
+void chapter_five_eight_tests(void) 
+{
+
+    int i;
+    
+    for(i=0; i < 15; i++)
+    {
+        printf("the month is %s\n", month_name(i));
+    }
+
+}
+
+/* chapter 5.9 */
+/*
+    conventional rectangular subscript calculation 20 * row +col
+    
+    int a[10][20];
+    int *b[10];
+
+    b needs to be initialized explicitly
+    b's rows might might be of different lenghts => saves us space
+
+*/
+/* Exercise 5-9. Rewrite the routines day_of_year and month_day with pointers instead of indexing. */
+int pday_of_year(int year, int month, int day)
+{
+    int i, leap;
+    /* check year */
+    if(year < 0)
+    {
+        printf("year cannot be negative\n");
+        return 0;
+    } 
+
+    /* !(month >= 1 && month <= 12) */
+    if(!(month >= 1 && month <= 12)) 
+    {
+        printf("month is invalid\n");
+        return 0;
+    }
+
+    /* (day >= 1 && day <= 31) */
+    if(!(day >= 1 && day <= 31)) 
+    {
+        printf("day is invalid\n");
+        return 0;
+    }
+
+    leap = ((year%4 == 0) && (year%100 != 0)) || (year%400 == 0);
+    /* check if day is greater than max month */
+    if(day > *((*(daytab+leap))+month)) {
+        printf("day is greater than max month day\n");
+        return 0;
+    }
+
+    for (i = 1; i < month; i++)
+    {
+
+        day += *((*(daytab+leap)) + i);
+    }
+    return day;
+}
+/* month_day:  set month, day from day of year */
+void pmonth_day(int year, int yearday, int *pmonth, int *pday)
+{
+    int i, leap;
+    if(!pmonth || !pday)
+    {
+        printf("the pointers are null\n");
+        return;
+    }
+
+    if(year < 0)
+    {
+        printf("year cannot be negative\n");
+        return; 
+    } 
+
+    if(yearday < 1 || yearday > 365)
+    {
+        printf("invalid yearday\n");
+        return;
+    }
+    leap = ((year%4 == 0) && (year%100 != 0)) || (year%400 == 0);
+    
+    for (i = 1; yearday > *((*(daytab+leap)) + i); i++)
+    {
+        yearday -= **(daytab + (13 * leap + i));
+    }
+    
+    *pmonth = i;
+    *pday = yearday;
+}
+
+
+void exercise_five_nine_tests(void)
+{
+    int year, month, day, yearday;
+    year = 2020;
+    month = 9;
+    day = 24;
+    yearday = pday_of_year(year, month, day);
+    printf("the result of day_year is %d\n", yearday); 
+
+
+    int pmonth, pday;
+    pmonth = pday = 0;
+    month_day(year, yearday, &pmonth, &pday);
+
+    printf("month is %d, day is %d\n", pmonth, pday);
+}
+
 
 int main()
 {
@@ -355,6 +572,18 @@ int main()
     // exercise_five_four_tests();
 
     /* exercise 5-5 tests */
-    exercise_five_five_tests();
+    // exercise_five_five_tests();
+    
+    /* exercise 5-8 tests */
+    // exercise_five_eight_tests();
+    
+    /* chapter 5.8 tests */
+    // chapter_five_eight_tests();
+    
+    /* exercise 5-9 tests */
+    //exercise_five_nine_tests();
+
+    
+
     return 0;
 }
