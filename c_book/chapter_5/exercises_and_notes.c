@@ -350,17 +350,17 @@ int day_of_year(int year, int month, int day)
     {
         printf("year cannot be negative\n");
         return 0;
-    } 
+    }
 
     /* !(month >= 1 && month <= 12) */
-    if(!(month >= 1 && month <= 12)) 
+    if(!(month >= 1 && month <= 12))
     {
         printf("month is invalid\n");
         return 0;
     }
 
     /* (day >= 1 && day <= 31) */
-    if(!(day >= 1 && day <= 31)) 
+    if(!(day >= 1 && day <= 31))
     {
         printf("day is invalid\n");
         return 0;
@@ -392,8 +392,8 @@ void month_day(int year, int yearday, int *pmonth, int *pday)
     if(year < 0)
     {
         printf("year cannot be negative\n");
-        return; 
-    } 
+        return;
+    }
 
     if(yearday < 1 || yearday > 365)
     {
@@ -401,25 +401,25 @@ void month_day(int year, int yearday, int *pmonth, int *pday)
         return;
     }
     leap = ((year%4 == 0) && (year%100 != 0)) || (year%400 == 0);
-    
+
     for (i = 1; yearday > daytab[leap][i]; i++)
     {
         yearday -= daytab[leap][i];
     }
-    
+
     *pmonth = i;
     *pday = yearday;
 }
 
-void exercise_five_eight_tests(void) 
+void exercise_five_eight_tests(void)
 {
     int year, month, day, yearday;
     year = 2020;
     month = 9;
     day = 24;
     yearday = day_of_year(year, month, day);
-    printf("the result of day_year is %d\n", yearday); 
-    
+    printf("the result of day_year is %d\n", yearday);
+
     int pmonth, pday;
     pmonth = pday = 0;
     month_day(year, yearday, &pmonth, &pday);
@@ -446,7 +446,7 @@ void chapter_five_eight_tests(void)
 {
 
     int i;
-    
+
     for(i=0; i < 15; i++)
     {
         printf("the month is %s\n", month_name(i));
@@ -457,7 +457,7 @@ void chapter_five_eight_tests(void)
 /* chapter 5.9 */
 /*
     conventional rectangular subscript calculation 20 * row +col
-    
+
     int a[10][20];
     int *b[10];
 
@@ -474,7 +474,7 @@ int pday_of_year(int year, int month, int day)
     {
         printf("year cannot be negative\n");
         return 0;
-    } 
+    }
 
     /* !(month >= 1 && month <= 12) */
     if(!(month >= 1 && month <= 12)) 
@@ -517,8 +517,8 @@ void pmonth_day(int year, int yearday, int *pmonth, int *pday)
     if(year < 0)
     {
         printf("year cannot be negative\n");
-        return; 
-    } 
+        return;
+    }
 
     if(yearday < 1 || yearday > 365)
     {
@@ -526,12 +526,11 @@ void pmonth_day(int year, int yearday, int *pmonth, int *pday)
         return;
     }
     leap = ((year%4 == 0) && (year%100 != 0)) || (year%400 == 0);
-    
+
     for (i = 1; yearday > *((*(daytab+leap)) + i); i++)
     {
         yearday -= **(daytab + (13 * leap + i));
     }
-    
     *pmonth = i;
     *pday = yearday;
 }
@@ -544,7 +543,7 @@ void exercise_five_nine_tests(void)
     month = 9;
     day = 24;
     yearday = pday_of_year(year, month, day);
-    printf("the result of day_year is %d\n", yearday); 
+    printf("the result of day_year is %d\n", yearday);
 
 
     int pmonth, pday;
@@ -567,23 +566,21 @@ int main()
 
     /* exercise 5-3 tests */
     // exercise_five_three_tests();
-    
+
     /* exercise 5-4 tests */
     // exercise_five_four_tests();
 
     /* exercise 5-5 tests */
     // exercise_five_five_tests();
-    
+
     /* exercise 5-8 tests */
     // exercise_five_eight_tests();
-    
+
     /* chapter 5.8 tests */
     // chapter_five_eight_tests();
-    
+
     /* exercise 5-9 tests */
     //exercise_five_nine_tests();
-
-    
 
     return 0;
 }
