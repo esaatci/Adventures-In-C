@@ -1,25 +1,8 @@
-BUILDDIR = build
-
-C_FILES := $(wildcard *.c)
-OBJS_FILES := $(C_FILES:.c=.o)
-OBJS := $(foreach obj,$(OBJS_FILES), $(BUILDDIR)/$(obj))
-
-
-
 #compiler variables
 CC = gcc
 
-CC_FLAGS = ''
-
-
-LINKER = $(CC_PATH)/arm-none-eabi-ld
-LINKER_FLAGS = -o
-
 
 TARGET = word_alph_print
-
-
-Q = ''
 
 ###
 ### Target rules
