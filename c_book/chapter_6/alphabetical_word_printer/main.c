@@ -10,7 +10,7 @@ input:  a C program
 output: alpahbetical order printed variable names that are equal within n chars
 
 n chars is a command line feature
-do not count words within comments or strings
+do not count words within comments or strings TODO
 
 has minimal error checking
 
