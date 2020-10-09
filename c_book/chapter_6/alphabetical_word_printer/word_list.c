@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
+struct word_list *create_empty_list() {
+  return NULL;
+}
 
 struct word_list *create_list(char *word) {
   struct word_list *temp;
@@ -17,15 +20,10 @@ struct word_list *create_list(char *word) {
   return temp;
 }
 
-void append(struct word_list *head, char *word) {
+void append(struct word_list **head, char *word) {
   struct word_list *temp = create_list(word);
-  char *buf;
-
-  temp->next = head->next;
-  head->next = temp;
-  buf = temp->word;
-  temp->word = head->word;
-  head->word = buf;
+  temp->next = *head;
+  *head = temp;
 }
 
 void print_list(struct word_list *list) {

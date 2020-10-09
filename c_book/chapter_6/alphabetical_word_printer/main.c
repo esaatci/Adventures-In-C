@@ -1,6 +1,9 @@
 #include <stdio.h>
-#include "./bin_tree.h"
 #include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include "bin_tree.h"
+#include "get_word.h"
 /*
 
 input:  a C program
@@ -9,26 +12,30 @@ output: alpahbetical order printed variable names that are equal within n chars
 n chars is a command line feature
 do not count words within comments or strings
 
+has minimal error checking
+
 */
 #define NUMWORDS 5
+#define MAXWORD 100
 
 int main(int argc, char **argv) {
-  /* read the words in file */
-  /* insert them into our tree */
-  /* print tree */
   int i, n;
-  n = 1;
-  struct bin_tree *root = create_node();
-
-  char *words[] = {"A" ,"B" ,"C", "D", "W"};
-  for (i = 0; i < 4; i++) {
-    insert_word(root, words[i], n);
+  n = 2;
+  char word[MAXWORD];
+  struct bin_tree *r = create_empty_tree();
+  /* get command line arguments */
+  if (argc == 1) {
+    n = 1;
+  } else {
+    n = atoi(argv[1]);
   }
-  print_tree(root);
+  /* read the words in file and insert them to tree */
+  while (getword(word, MAXWORD) != EOF) {
+    if (isalpha(word[0])) {
+      insert_word(&r, word, n);
+    }
+  }
+  /* output the tree to console */
+  print_tree(r);
   return 0;
 }
-
-// char *word = "efe";
-// struct word_list *list = create_list(word);
-// append(list, "charizard");
-// print_list(list);

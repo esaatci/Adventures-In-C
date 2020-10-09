@@ -11,11 +11,11 @@ struct bin_tree {
   struct bin_tree *left;
 };
 
-
-struct bin_tree *create_node(void);
-void set_list(struct bin_tree *r, struct word_list *l);
-char *get_word(struct bin_tree *r);
-void insert_word(struct bin_tree *r, char *w, int n);
+struct bin_tree *create_empty_tree(void);
+struct bin_tree *create_node(char *w);
+void insert_word(struct bin_tree **r, char *w, int n);
 void print_tree(struct bin_tree *r);
+void delete_tree(struct bin_tree *r);
+
 
 #endif /* __BINTREE__ */
