@@ -13,7 +13,7 @@ $(TARGET): main.o bin_tree.o word_list.o
 main.o: main.c word_list.h
 	$(CC) -c -g main.c
 
-bin_tree.o: bin_tree.c bin_tree.h
+bin_tree.o: bin_tree.c bin_tree.h word_list.h
 	$(CC) -c -g bin_tree.c
 
 word_list.o : word_list.c word_list.h

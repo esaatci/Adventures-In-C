@@ -1,4 +1,4 @@
-#include "word_list.h"
+#include "./word_list.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -18,7 +18,6 @@ struct word_list *create_list(char *word) {
 }
 
 void append(struct word_list *head, char *word) {
-
   struct word_list *temp = create_list(word);
   char *buf;
 
@@ -27,7 +26,6 @@ void append(struct word_list *head, char *word) {
   buf = temp->word;
   temp->word = head->word;
   head->word = buf;
-
 }
 
 void print_list(struct word_list *list) {

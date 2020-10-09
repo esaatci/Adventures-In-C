@@ -1,6 +1,6 @@
 #ifndef __BINTREE__
 #define __BINTREE__
-#include "word_list.h"
+
 
 
 struct bin_tree {
@@ -13,9 +13,9 @@ struct bin_tree {
 
 
 struct bin_tree *create_node(void);
-void set_list(struct word_list *l);
+void set_list(struct bin_tree *r, struct word_list *l);
 char *get_word(struct bin_tree *r);
-void insert_word(struct bin_tree *r);
+void insert_word(struct bin_tree *r, char *w, int n);
 void print_tree(struct bin_tree *r);
 
 #endif /* __BINTREE__ */
