@@ -4,6 +4,13 @@
 
 #define LIM 1000
 
+/* Exercise 6-3. Write a cross-referencer that prints a list
+of all words in a document,
+and for each word,
+a list of the line numbers on which it occurs.
+Remove noise words like ‘‘the,’’ ‘‘and,’’ and so on.
+*/
+
 char *line;
 unsigned long char_count;
 char *word;
