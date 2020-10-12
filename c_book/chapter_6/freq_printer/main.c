@@ -135,7 +135,6 @@ void selection_sort(void) {
 
 
 void swap(int i, int j) {
-
   struct pair temp;
   int s_len;
 
