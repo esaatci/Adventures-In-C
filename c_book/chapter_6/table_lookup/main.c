@@ -1,6 +1,5 @@
-#include "hash_table.h"
 #include <stdio.h>
-
+#include "hash_table.h"
 
 
 int main() {
@@ -18,4 +17,3 @@ int main() {
   printf("res should be NULL %p\n", res);
   return 0;
 }
-
