@@ -1,6 +1,8 @@
-#include <sys/syscall.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <fcntl.h>
+#include <stdlib.h>
 
 /*
 Exercise 8-1. Rewrite the program cat from Chapter 7
@@ -38,7 +40,6 @@ void filecopy(int ifd) {
       error("can't write!!");
     }
   }
-  return 0;
 }
 
 void error(char *fmt, ...) {
@@ -46,7 +47,7 @@ void error(char *fmt, ...) {
 
   va_start(args, fmt);
   fprintf(stderr, "error: ");
-  vprintf(stderr, fmt, args);
+  vprintf(fmt, args);
   fprintf(stderr, "\n");
   va_end(args);
   exit(1);
