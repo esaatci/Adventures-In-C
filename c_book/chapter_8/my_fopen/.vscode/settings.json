@@ -3,6 +3,7 @@
     "cstdarg": "cpp",
     "cstddef": "cpp",
     "cstdio": "cpp",
-    "cstdint": "cpp"
+    "cstdint": "cpp",
+    "random": "c"
   }
 }

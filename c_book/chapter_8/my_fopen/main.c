@@ -9,11 +9,11 @@
 #define OPEN_MAX  20    /* max #files open at once */
 
 typedef struct _iobuf {
-int  cnt; /* characters left */
-char *ptr; /* next character position */
+int  cnt;   /* characters left */
+char *ptr;  /* next character position */
 char *base; /* location of buffer */
-int  flag; /* mode of file access */
-int  fd; /* file descriptor */
+int  flag;  /* mode of file access */
+int  fd;    /* file descriptor */
 } FILE;
 
 
@@ -42,12 +42,13 @@ int _flushbuf(int, FILE *);
 
 #define feof(p) ((p)->flag & _EOF) != 0)
 #define ferror(p) ((p)->flag & _ERR) != 0)
+#define funbuf(p) ((p)->flag & _UNBUF) != 0)
 #define fileno(p) ((p)->fd)
 
 #define getc(p) (--(p)->cnt >= 0 \
                 ? (unsigned char) *(p)->ptr++ : _fillbuf(p))
-#define putc(x,p) (--(p)->cnt >= 0 \
-               ? *(p)->ptr++ = (x) : _flushbuf((x),p))
+#define putc(x, p) (--(p)->cnt >= 0 \
+               ? *(p)->ptr++ = (x) : _flushbuf((x), p))
 
 #define getchar()   getc(stdin)
 #define putcher(x)  putc((x), stdout)
@@ -58,7 +59,7 @@ int _flushbuf(int, FILE *);
 FILE *fopen(char *name, char *mode) {
   int fd;
   FILE *fp;
-
+  /* check for invalid mode */
   if (*mode != 'r' && *mode != 'w' && *mode != 'a') {
     return NULL;
   }
@@ -97,7 +98,6 @@ FILE *fopen(char *name, char *mode) {
 }
 
 /* _fillbuf: allocate and fill input buffer */
-
 int _fillbuf(FILE *fp) {
   int bufsize;
 
@@ -111,6 +111,7 @@ int _fillbuf(FILE *fp) {
       return EOF;
     }
   }
+
   fp->ptr = fp->base;
   fp->cnt = read(fp->fd, fp->ptr, bufsize);
   if (--fp->cnt < 0) {
@@ -125,8 +126,140 @@ int _fillbuf(FILE *fp) {
   return (unsigned char) *fp->ptr++;
 }
 
+/* _flushbuf: clear the input buffer and set the first char with s*/
+int _flushbuf(int s, FILE * fp) {
+  char *pt;
+  int i;
+
+  if (fp->flag & _ERR) {
+    return EOF;
+  }
+
+  if (fp->flag & _EOF) {
+    fp->flag &= ~_EOF;
+  }
+
+  if (fp->flag & _UNBUF) {
+    *fp->base = (unsigned char) s;
+    return 0;
+  }
+
+  fp->cnt = 1;
+  fp->ptr = fp->base;
+  *fp->ptr++ = s;
+
+  return 0;
+}
+
+/* fclose closes and deinit FILE */
+int fclose(FILE *fp) {
+  FILE *fptr;
+  int found, flushed;
+
+  found = 0;
+  for (fptr = _iob; fptr < _iob + OPEN_MAX; fptr++) {
+    if (fptr->fd == fp->fd) {
+      found = 1;
+      break;
+    }
+  }
+  if (!found) {
+    return 1;
+  }
+
+  fp->ptr = NULL;
+  free(fp->base);
+
+  fp->fd = -1;
+  fp->cnt = 0;
+  fp->flag = 0;
+
+  return 0;
+}
+
+/*
+is identical to lseek except that fp is a file pointer instead of a
+file descriptor and return value is an int status, not a position.
+*/
+
+int fseek(FILE *fp, long offset, int origin) {
+  int new_cnt;
+  char *cur;
+  enum position {
+    START = 0,
+    CURRENT = 1,
+    END = 2
+  };
+  /* error checks */
+  if (!fp) {
+    return 1;
+  }
+  if (origin < 0 || origin > 2) {
+    return 1;
+  }
+  if (fp->flag & _ERR) {
+    return 1;
+  }
+  if (fp->flag & _UNBUF) {
+    return 0;
+  }
+
+  switch (origin) {
+    case START: {
+      cur = fp->ptr;
+      fp->ptr = fp->base;
+      if (offset < 0 || offset >= BUFSIZ) {
+        fp->ptr = cur;
+        return 1;
+      }
+      fp->ptr += offset;
+      if (cur > fp->ptr) {
+        new_cnt = cur - fp->ptr;
+        fp->cnt += new_cnt;
+      } else {
+        new_cnt = fp->ptr - cur;
+        fp->cnt -= new_cnt;
+      }
+      break;
+    }
+    case CURRENT: {
+      cur = fp->ptr;
+      fp->ptr += offset;
+      /* pointer exceeds the total size or smaller than base */
+      if (fp->ptr > fp->base + BUFSIZ || fp->ptr < fp->base) {
+        fp->ptr = cur;
+        return 1;
+      }
+      if (cur > fp->ptr) {
+        new_cnt = cur - fp->ptr;
+        fp->cnt += new_cnt;
+      } else {
+        new_cnt = fp->ptr - cur;
+        fp->cnt -= new_cnt;
+      }
+      break;
+    }
+    case END: {
+      cur = fp->ptr;
+      if (offset > 0) {
+        return 1;
+      }
+      fp->ptr += offset;
+      if (fp->ptr < fp->base) {
+        fp->ptr = cur;
+        return 1;
+      }
+      new_cnt = cur - fp->ptr;
+      fp->cnt += new_cnt;
+      break;
+    }
+  }
+  return 0;
+}
+
 
 
 int main() {
+  FILE *fp = fopen("Makefile", "r");
   return 0;
 }
