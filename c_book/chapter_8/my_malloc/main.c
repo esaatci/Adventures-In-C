@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <unistd.h>
+
 #define NALLOC  1024   /* minimum #units to request */
 
 
@@ -14,19 +17,27 @@ union header {          /* block header */
 typedef union header Header;
 
 static Header base;     /* empty list */
-static header *freep = NULL; /* start of free list */
+static Header *freep = NULL; /* start of free list */
 
 
 static Header *morecore(unsigned nu);
-void *malloc(unsigned nbytes);
-void free(void *ap);
-
+void *my_malloc(unsigned nbytes);
+void my_free(void *ap);
+void *my_calloc(int n, unsigned size);
+void bfree(void *p, unsigned n);
 
 int main(void) {
+  char *my_ptr = (char *) my_malloc(10);
+  char *test_ptr = (char *) my_calloc(10, 10);
+  // for (int i = 0; i < 100; i++) {
+  //   printf("%d\n", test_ptr[i]);
+  // }
+  char arr[100];
+  bfree((void *)arr, 100);
   return 0;
 }
 
-void *malloc(unsigned nbytes) {
+void *my_malloc(unsigned nbytes) {
   Header *p, *prevp;
   unsigned nunits;
 
@@ -67,22 +78,20 @@ static Header *morecore(unsigned nu) {
   }
 
   cp = sbrk(nu * sizeof(Header));
-
   if (cp == (char *) -1) { /* no space left */
     return NULL;
   }
-
   up = (Header *) cp;
   up->s.size = nu;
-  free((void *)(up+1));
+  my_free((void *)(up + 1));
 
   return freep;
 }
 
 /* free:  put block ap in free list */
-void free(void *ap) {
+void my_free(void *ap) {
   Header *bp, *p;
-  bp = (Header *)ap - 1;    /* point to  block header */
+  bp = (Header *) ap - 1;    /* point to block header */
 
   for (p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr) {
     if (p >= p->s.ptr && (bp > p || bp < p->s.ptr)) {
@@ -90,14 +99,14 @@ void free(void *ap) {
     }
   }
 
-  if (bp + bp->size == p->s.ptr) {    /* join to upper nbr */
+  if (bp + bp->s.size == p->s.ptr) {    /* join to upper nbr */
     bp->s.size += p->s.ptr->s.size;
     bp->s.ptr = p->s.ptr->s.ptr;
   } else {
     bp->s.ptr = p->s.ptr;
   }
 
-  if (p + p->size == bp) {          /* join to lower nbr */
+  if (p + p->s.size == bp) {          /* join to lower nbr */
     p->s.size += bp->s.size;
     p->s.ptr = bp->s.ptr;
   } else {
@@ -105,4 +114,40 @@ void free(void *ap) {
   }
 
   freep = p;
+}
+
+/*
+  my_calloc: pointer to n objects of size
+  size with the storarage initialized to 0
+*/
+void *my_calloc(int n, unsigned size) {
+  unsigned total;
+  void *ptr, *p;
+  char *cast;
+
+  total = (n * size);
+  if ((ptr = my_malloc(total)) == NULL) {
+    return NULL;
+  }
+
+  for (p = ptr; p != ptr + total; p++) {
+    cast = (char *) p;
+    *cast = 0;
+  }
+
+  return ptr;
+}
+
+/*
+Write a routine bfree(p,n) that will free any arbitrary block p of n characters
+into the free list maintained by malloc and free.
+By using bfree, a user can add a static or external array to the free list at any time.
+*/
+
+void bfree(void *p, unsigned n) {
+  Header *up;
+
+  up = (Header *) p;
+  up->s.size = n;
+  my_free((void *)(up + 1));
 }
